@@ -903,7 +903,7 @@ void send_test(struct timespec *timeArray, int iter, int *i) {
 	memset(&server_addr, 0, sizeof(struct sockaddr_un));
 	server_addr.sun_family = AF_UNIX;
 	strncpy(server_addr.sun_path, home, sizeof(server_addr.sun_path) - 1); 
-	strncpy(server_addr.sun_path, sock, sizeof(server_addr.sun_path) - 1); 
+	strncat(server_addr.sun_path, sock, sizeof(server_addr.sun_path) - strlen(home) - 1); 
 
 	int forkId = fork();
 
@@ -935,7 +935,7 @@ void send_test(struct timespec *timeArray, int iter, int *i) {
 
 		read(fds2[0], &r, 1);
 
-		remove(sock);
+		remove(server_addr.sun_path);
 		close(fd_server);
 		close(fd_connect);
 		close(fds1[1]);
@@ -1003,7 +1003,8 @@ void recv_test(struct timespec *timeArray, int iter, int *i) {
 	struct sockaddr_un server_addr;
 	memset(&server_addr, 0, sizeof(struct sockaddr_un));
 	server_addr.sun_family = AF_UNIX;
-	strncpy(server_addr.sun_path, sock, sizeof(server_addr.sun_path) - 1); 
+	strncpy(server_addr.sun_path, home, sizeof(server_addr.sun_path) - 1); 
+	strncat(server_addr.sun_path, sock, sizeof(server_addr.sun_path) - strlen(home) - 1);
 
 	int forkId = fork();
 
@@ -1055,7 +1056,7 @@ void recv_test(struct timespec *timeArray, int iter, int *i) {
 
 		write(fds1[1], &w, 1);
 
-		remove(sock);
+		remove(server_addr.sun_path);
 		close(fd_server);
 		close(fd_connect);
 		close(fds1[1]);
