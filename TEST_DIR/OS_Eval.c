@@ -603,7 +603,7 @@ void page_fault_test(struct timespec *diffTime) {
 	char a = *((char *)addr);
 	clock_gettime(CLOCK_MONOTONIC,&endTime);
 	
-	printf("read: %c\n", a);
+//	printf("read: %c\n", a);
 	syscall(SYS_munmap, addr, file_size);
         close(fd);
 	add_diff_to_sum(diffTime, endTime, startTime);
@@ -917,7 +917,7 @@ void send_test(struct timespec *timeArray, int iter, int *i) {
 		close(fds2[1]);
 
 		struct sockaddr_un client_addr;
-		socklen_t client_addr_len;
+		socklen_t client_addr_len = sizeof(client_addr);
 	
 		int fd_server = socket(AF_UNIX, SOCK_STREAM, 0);
 		if (fd_server < 0) printf("[error] failed to open server socket.\n");
@@ -937,6 +937,7 @@ void send_test(struct timespec *timeArray, int iter, int *i) {
 
 		remove(server_addr.sun_path);
 		close(fd_server);
+		shutdown(fd_connect, SHUT_RDWR);
 		close(fd_connect);
 		close(fds1[1]);
 		close(fds2[0]);
@@ -1018,7 +1019,7 @@ void recv_test(struct timespec *timeArray, int iter, int *i) {
 		close(fds2[1]);
 
 		struct sockaddr_un client_addr;
-		socklen_t client_addr_len;
+		socklen_t client_addr_len = sizeof(client_addr);
 	
 		int fd_server = socket(AF_UNIX, SOCK_STREAM, 0);
 		if (fd_server < 0) printf("[error] failed to open server socket.\n");
@@ -1058,6 +1059,7 @@ void recv_test(struct timespec *timeArray, int iter, int *i) {
 
 		remove(server_addr.sun_path);
 		close(fd_server);
+		shutdown(fd_connect, SHUT_RDWR);
 		close(fd_connect);
 		close(fds1[1]);
 		close(fds2[0]);
